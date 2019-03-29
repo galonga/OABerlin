@@ -10,18 +10,16 @@ import androidx.appcompat.app.AppCompatActivity
 import de.galonga.ordnungsamtonline.clients.HybridWebChromeClient
 import de.galonga.ordnungsamtonline.clients.HybridWebViewClient
 
-
 class MainActivity : AppCompatActivity() {
     companion object {
         const val BASE_URL = "https://ordnungsamt.berlin.de/frontend.mobile/"
-        // Token: 0x04000007 RID: 7
         const val REQUEST_CODE_CAMERA = 15
-        // Token: 0x04000008 RID: 8
         const val REQUEST_CODE_FILE_CHOOSER = 255
     }
 
     private lateinit var hybridWebChromeClient: HybridWebChromeClient
     private lateinit var webView: WebView
+    var url = ""
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +30,6 @@ class MainActivity : AppCompatActivity() {
         webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
         webView.settings.setGeolocationEnabled(true)
-        // webView.settings.setGeolocationDatabasePath(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments));
         webView.settings.allowContentAccess = true
 
         webView.setInitialScale(100)
@@ -58,7 +55,7 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         data?.let {
             if (requestCode == REQUEST_CODE_CAMERA || requestCode == REQUEST_CODE_FILE_CHOOSER) {
-                // hybridWebChromeClient.setReceivedValue(requestCode, resultCode, data)
+                hybridWebChromeClient.setReceivedValue(requestCode, resultCode, data)
 
                 return
             }
