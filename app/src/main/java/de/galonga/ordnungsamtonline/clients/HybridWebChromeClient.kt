@@ -1,23 +1,55 @@
 package de.galonga.ordnungsamtonline.clients
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.webkit.GeolocationPermissions
 import android.webkit.WebChromeClient
+import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import de.galonga.ordnungsamtonline.MainActivity
 
-
 class HybridWebChromeClient constructor(private val mainActivity: MainActivity) : WebChromeClient() {
+
+    companion object {
+        const val PERMISSION_REQUEST_CODE = 200
+    }
 
     // private var uploadMessage = ValueCallback<Uri>()
 
     private var outputFileUri: Uri? = null
 
     override fun onGeolocationPermissionsShowPrompt(origin: String?, callback: GeolocationPermissions.Callback?) {
+        super.onGeolocationPermissionsShowPrompt(origin, callback)
+        requestPermission()
+        turnGPSOn()
+
         callback?.invoke(origin, true, false)
+    }
+
+    private fun requestPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(mainActivity, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            Toast.makeText(mainActivity, "GPS permission allows us to access location data. Please allow in App Settings for additional functionality.", Toast.LENGTH_LONG).show()
+        } else {
+            ActivityCompat.requestPermissions(mainActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_REQUEST_CODE)
+        }
+    }
+
+    private fun turnGPSOn() {
+        val provider = Settings.Secure.getString(mainActivity.contentResolver, Settings.Secure.LOCATION_PROVIDERS_ALLOWED)
+
+        if (!provider.contains("gps")) {
+            //if gps is disabled
+            val poke = Intent()
+            poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider")
+            poke.addCategory(Intent.CATEGORY_ALTERNATIVE)
+            poke.data = Uri.parse("3")
+            mainActivity.sendBroadcast(poke)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
