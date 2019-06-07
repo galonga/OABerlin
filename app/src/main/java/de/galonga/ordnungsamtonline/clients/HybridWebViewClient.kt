@@ -18,7 +18,7 @@ class HybridWebViewClient constructor(private val mainActivity: MainActivity) : 
 
     override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
         url?.let {
-            if ((url.startsWith("http:") || url.startsWith("https:")) && !url.startsWith(mainActivity.url)) {
+            if ((url.startsWith("http:") || url.startsWith("https:")) && !url.startsWith(MainActivity.BASE_URL)) {
                 val intent = Intent("android.intent.action.VIEW", Uri.parse(url))
                 mainActivity.startActivity(intent)
 
